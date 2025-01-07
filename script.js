@@ -27,5 +27,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
   sortByPriorityBtn.addEventListener("click", () => {
     const columns = document.querySelectorAll(".column");
+    columns.forEach((column) => {
+      const cards = Array.from(column.querySelectorAll(".card"));
+      const priorityOrder = { high: 1, medium: 2, low: 3 };
+      cards.sort((a, b) => {
+        const priorityA = a.getAttribute("data-priority");
+        const priorityB = b.getAttribute("data-priority");
+        return priorityOrder[priorityA] - priorityOrder[priorityB];
+      });
+      cards.forEach((card) => {
+        column.appendChild(card);
+      });
+    });
   });
 });
