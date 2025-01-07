@@ -25,6 +25,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  //test 
+  //test
+
   sortByPriorityBtn.addEventListener("click", () => {
     // ...
   });
