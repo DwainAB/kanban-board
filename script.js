@@ -7,6 +7,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchInput");
   const sortByPriorityBtn = document.getElementById("sortByPriorityBtn");
   const closeBtn = document.getElementsByClassName("close-btn")[0];
+  let dataId = 5; // Initialisation de l'ID de départ
+
 
   // Éventuellement, on écoute les événements
   addCardBtn.onclick = function () {
@@ -33,22 +35,52 @@ window.addEventListener("DOMContentLoaded", () => {
     const priority = document.getElementById("priority").value;
     const columnToDo = document.querySelector('.column[data-status="todo"]');
 
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.setAttribute("data-priority", priority);
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.setAttribute('data-id', dataId);
+    card.setAttribute('data-priority', priority);
+
 
     card.innerHTML = `
         <h3>${title}</h3>
         <p>${content}</p>
+        <button class="delete-card">Supprimer</button>
     `;
 
     columnToDo.appendChild(card);
+
+    // Evénement pour supprimer la carte
+    card.querySelector('.delete-card').addEventListener('click', function () {
+      deleteCard(card);
+    });
+
+
+    dataId = dataId + 1;
 
     cardModal.style.display = "none";
     cardForm.reset();
 
     saveCards();
-  };
+  }
+
+
+
+  //feature pour supprimer
+  function deleteCard(cardElement) {
+    const cardId = cardElement.getAttribute('data-id');
+
+    cardElement.remove();
+
+    // Mise à jour du localStorage
+    let cardsData = JSON.parse(localStorage.getItem('kanbanCards')) || [];
+    cardsData = cardsData.filter(card => card.DataId !== cardId);
+    localStorage.setItem('kanbanCards', JSON.stringify(cardsData));
+
+    console.log("Card supprimée :", cardId);
+
+  }
+
+
 
   //feature pour le filtre
 
@@ -92,48 +124,61 @@ function saveCards() {
 
   let cardsData = [];
 
-  columns.forEach((column) => {
-    const cards = column.querySelectorAll(".card");
-    cards.forEach((card) => {
-      if (!card.hasAttribute("data-id")) {
+
+  columns.forEach(column => {
+    const cards = column.querySelectorAll('.card');
+    cards.forEach(card => {
+      if (card.hasAttribute('data-id')) {
         cardsData.push({
-          title: card.querySelector("h3").textContent,
-          content: card.querySelector("p").textContent,
-          priority: card.getAttribute("data-priority"),
-          status: column.getAttribute("data-status"),
+          title: card.querySelector('h3').textContent,
+          content: card.querySelector('p').textContent,
+          priority: card.getAttribute('data-priority'),
+          DataId: card.getAttribute('data-id'),
+          status: column.getAttribute('data-status')
+
         });
       }
     });
   });
-
-  localStorage.setItem("kanbanCards", JSON.stringify(cardsData));
+  console.log("Saving cards:", cardsData);
+  localStorage.setItem('kanbanCards', JSON.stringify(cardsData));
 }
 
 // Affiche les cartes
 
 function loadCards() {
-  const cardsData = JSON.parse(localStorage.getItem("kanbanCards")) || [];
+  const cardsData = JSON.parse(localStorage.getItem('kanbanCards')) || [];
 
-  const dynamicCards = document.querySelectorAll(".card:not([data-id])");
-  dynamicCards.forEach((card) => card.remove());
+  // Supprimer les cartes dynamiques (celles qui ont un data-id supérieur à 4)
+  const dynamicCards = Array.from(document.querySelectorAll('.card[data-id]')).filter(card => {
+    return parseInt(card.getAttribute('data-id')) > 4;
+  });
+  
+  dynamicCards.forEach(card => card.remove());
 
-  cardsData.forEach((data) => {
-    const column = document.querySelector(
-      `.column[data-status="${data.status}"]`
-    );
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.setAttribute("data-priority", data.priority);
+  cardsData.forEach(data => {
+    if (parseInt(data.DataId) > 4) {
+      const column = document.querySelector(`.column[data-status="${data.status}"]`);
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.setAttribute('data-priority', data.priority);
+      card.setAttribute('data-id', data.DataId);
 
-    card.innerHTML = `
-      <h3>${data.title}</h3>
-      <p>${data.content}</p>
-    `;
+      card.innerHTML = `
+        <h3>${data.title}</h3>
+        <p>${data.content}</p>
+        <button class="delete-card">Supprimer</button>
+      `;
 
-    column.appendChild(card);
+      card.querySelector('.delete-card').addEventListener('click', function () {
+        deleteCard(card);
+      });
+
+      column.appendChild(card);
+    }
   });
 
-  // Feature : Drag n Drop
+  // Configuration du drag & drop
   document.querySelectorAll(".card").forEach((card) => {
     card.setAttribute("draggable", true);
     card.addEventListener("dragstart", (e) => {
@@ -144,6 +189,7 @@ function loadCards() {
       e.target.classList.remove("dragging");
     });
   });
+
   document.querySelectorAll(".column").forEach((column) => {
     column.addEventListener("dragover", (e) => {
       e.preventDefault();
