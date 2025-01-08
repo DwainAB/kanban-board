@@ -159,6 +159,7 @@ function loadCards() {
       const card = document.querySelector(`.card[data-id='${cardId}']`);
       if (card) {
         column.append(card);
+        saveCards(); 
       }
     });
   });
