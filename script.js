@@ -89,3 +89,51 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
+//Feature pour le localStorage
+
+function saveCards() {
+  const columns = document.querySelectorAll('.column');
+  console.log(columns[0]);
+  
+  let cardsData = [];  
+  
+  columns.forEach(column => {
+    const cards = column.querySelectorAll('.card');
+    cards.forEach(card => {
+      if (!card.hasAttribute('data-id')) {
+        cardsData.push({
+          title: card.querySelector('h3').textContent,
+          content: card.querySelector('p').textContent,
+          priority: card.getAttribute('data-priority'),
+          status: column.getAttribute('data-status')
+        });
+      }
+    });
+  });
+  
+  localStorage.setItem('kanbanCards', JSON.stringify(cardsData));
+}
+
+function loadCards() {
+  const cardsData = JSON.parse(localStorage.getItem('kanbanCards')) || [];
+  
+  const dynamicCards = document.querySelectorAll('.card:not([data-id])');
+  dynamicCards.forEach(card => card.remove());
+  
+  cardsData.forEach(data => {
+    const column = document.querySelector(`.column[data-status="${data.status}"]`);
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.setAttribute('data-priority', data.priority);
+    
+    card.innerHTML = `
+      <h3>${data.title}</h3>
+      <p>${data.content}</p>
+    `;
+    
+    column.appendChild(card);
+  });
+}
+
+loadCards();
