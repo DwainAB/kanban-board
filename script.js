@@ -152,7 +152,7 @@ function loadCards() {
   const dynamicCards = Array.from(document.querySelectorAll('.card[data-id]')).filter(card => {
     return parseInt(card.getAttribute('data-id')) > 4;
   });
-  
+
   dynamicCards.forEach(card => card.remove());
 
   cardsData.forEach(data => {
@@ -205,7 +205,7 @@ function loadCards() {
       const card = document.querySelector(`.card[data-id='${cardId}']`);
       if (card) {
         column.append(card);
-        saveCards(); 
+        saveCards();
       }
     });
   });
