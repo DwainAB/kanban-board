@@ -24,9 +24,11 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  //feature pour l'ajoute 
+
+
   cardForm.onsubmit = function (event) {
     event.preventDefault();
-
 
     const title = document.getElementById("title").value;
     const content = document.getElementById("content").value;
@@ -37,7 +39,6 @@ window.addEventListener("DOMContentLoaded", () => {
     card.classList.add('card');
     card.setAttribute('data-priority', priority);
 
-
     card.innerHTML = `
         <h3>${title}</h3>
         <p>${content}</p>
@@ -46,9 +47,13 @@ window.addEventListener("DOMContentLoaded", () => {
     columnToDo.appendChild(card);
 
     cardModal.style.display = "none";
-
     cardForm.reset();
+
+    saveCards(); 
   }
+
+
+  //feature pour le filtre
 
   searchInput.addEventListener("input", () => {
     const keyword = searchInput.value.toLowerCase();
@@ -62,6 +67,9 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+
+  //feature pour la priorité
 
   sortByPriorityBtn.addEventListener("click", () => {
     const columns = document.querySelectorAll(".column");
@@ -79,3 +87,5 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+
