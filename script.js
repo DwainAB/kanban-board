@@ -11,17 +11,21 @@ window.addEventListener("DOMContentLoaded", () => {
   // Éventuellement, on écoute les événements
   addCardBtn.onclick = function () {
     cardModal.style.display = "block";
-  };
+  }
 
   closeBtn.onclick = function () {
     cardModal.style.display = "none";
-  };
+  }
 
   window.onclick = function (event) {
     if (event.target === cardModal) {
       cardModal.style.display = "none";
     }
-  };
+  }
+
+
+  //feature pour l'ajoute 
+
 
   cardForm.onsubmit = function (event) {
     event.preventDefault();
@@ -31,9 +35,9 @@ window.addEventListener("DOMContentLoaded", () => {
     const priority = document.getElementById("priority").value;
     const columnToDo = document.querySelector('.column[data-status="todo"]');
 
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.setAttribute("data-priority", priority);
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.setAttribute('data-priority', priority);
 
     card.innerHTML = `
         <h3>${title}</h3>
@@ -43,14 +47,18 @@ window.addEventListener("DOMContentLoaded", () => {
     columnToDo.appendChild(card);
 
     cardModal.style.display = "none";
-
     cardForm.reset();
-  };
+
+    saveCards(); 
+  }
+
+
+  //feature pour le filtre
 
   searchInput.addEventListener("input", () => {
     const keyword = searchInput.value.toLowerCase();
     const cards = document.querySelectorAll(".card");
-    cards.forEach((card) => {
+    cards.forEach(card => {
       const taskContent = card.querySelector("h3").textContent.toLowerCase();
       if (taskContent.includes(keyword)) {
         card.style.display = "";
@@ -59,6 +67,9 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+
+  //feature pour la priorité
 
   sortByPriorityBtn.addEventListener("click", () => {
     const columns = document.querySelectorAll(".column");
@@ -75,11 +86,56 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
+});
 
-  document.querySelectorAll(".card").forEach((card) => {
-    card.setAttribute("draggable", true);
-    card.addEventListener("dragstart", (e) => {
-      e.dataTransfer.setData("text/plain", e.getAttribute("data-id"));
+
+
+//Feature pour le localStorage
+
+function saveCards() {
+  const columns = document.querySelectorAll('.column');
+  console.log(columns[0]);
+  
+  let cardsData = [];  
+  
+  columns.forEach(column => {
+    const cards = column.querySelectorAll('.card');
+    cards.forEach(card => {
+      if (!card.hasAttribute('data-id')) {
+        cardsData.push({
+          title: card.querySelector('h3').textContent,
+          content: card.querySelector('p').textContent,
+          priority: card.getAttribute('data-priority'),
+          status: column.getAttribute('data-status')
+        });
+      }
     });
   });
-});
+  
+  localStorage.setItem('kanbanCards', JSON.stringify(cardsData));
+}
+
+// Affiche les cartes 
+
+function loadCards() {
+  const cardsData = JSON.parse(localStorage.getItem('kanbanCards')) || [];
+  
+  const dynamicCards = document.querySelectorAll('.card:not([data-id])');
+  dynamicCards.forEach(card => card.remove());
+  
+  cardsData.forEach(data => {
+    const column = document.querySelector(`.column[data-status="${data.status}"]`);
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.setAttribute('data-priority', data.priority);
+    
+    card.innerHTML = `
+      <h3>${data.title}</h3>
+      <p>${data.content}</p>
+    `;
+    
+    column.appendChild(card);
+  });
+}
+
+loadCards();
