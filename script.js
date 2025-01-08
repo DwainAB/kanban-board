@@ -61,6 +61,7 @@ window.addEventListener("DOMContentLoaded", () => {
     cardForm.reset();
 
     saveCards();
+    loadCards()
   }
 
 
@@ -114,16 +115,15 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
-});
 
-//Feature pour le localStorage
+
+  //Feature pour le localStorage
 
 function saveCards() {
   const columns = document.querySelectorAll(".column");
   console.log(columns[0]);
 
   let cardsData = [];
-
 
   columns.forEach(column => {
     const cards = column.querySelectorAll('.card');
@@ -149,7 +149,6 @@ function saveCards() {
 function loadCards() {
   const cardsData = JSON.parse(localStorage.getItem('kanbanCards')) || [];
 
-  // Supprimer les cartes dynamiques (celles qui ont un data-id supérieur à 4)
   const dynamicCards = Array.from(document.querySelectorAll('.card[data-id]')).filter(card => {
     return parseInt(card.getAttribute('data-id')) > 4;
   });
@@ -177,6 +176,7 @@ function loadCards() {
       column.appendChild(card);
     }
   });
+
 
   // Configuration du drag & drop
   document.querySelectorAll(".card").forEach((card) => {
@@ -212,3 +212,10 @@ function loadCards() {
 }
 
 loadCards();
+
+
+
+
+
+});
+
