@@ -115,6 +115,8 @@ function saveCards() {
   localStorage.setItem('kanbanCards', JSON.stringify(cardsData));
 }
 
+// Affiche les cartes 
+
 function loadCards() {
   const cardsData = JSON.parse(localStorage.getItem('kanbanCards')) || [];
   
